@@ -77,7 +77,7 @@ func CompleteTask(w http.ResponseWriter, r *http.Request) {
 
 	var task models.Task
 	err = db.DB.QueryRow(
-		"UPDATE tasks SET completed = TRUE WHERE id = $1 RETURNING id, title, completed, created_at",
+		"UPDATE tasks SET completed = NOT completed WHERE id = $1 RETURNING id, title, completed, created_at",
 		id,
 	).Scan(&task.ID, &task.Title, &task.Completed, &task.CreatedAt)
 	if err == sql.ErrNoRows {

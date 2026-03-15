@@ -12,7 +12,7 @@ import (
 
 func corsMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Origin", "http://localhost:3000")
 		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PATCH, DELETE, OPTIONS")
 		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
 
@@ -30,12 +30,12 @@ func main() {
 
 	r := mux.NewRouter()
 
-	r.HandleFunc("/tasks", handlers.GetTasks).Methods("GET")
-	r.HandleFunc("/tasks", handlers.CreateTask).Methods("POST")
-	r.HandleFunc("/tasks/{id}", handlers.CompleteTask).Methods("PATCH")
-	r.HandleFunc("/tasks/{id}", handlers.DeleteTask).Methods("DELETE")
-
 	r.Use(corsMiddleware)
+
+	r.HandleFunc("/tasks", handlers.GetTasks).Methods("GET", "OPTIONS")
+	r.HandleFunc("/tasks", handlers.CreateTask).Methods("POST", "OPTIONS")
+	r.HandleFunc("/tasks/{id}", handlers.CompleteTask).Methods("PATCH", "OPTIONS")
+	r.HandleFunc("/tasks/{id}", handlers.DeleteTask).Methods("DELETE", "OPTIONS")
 
 	log.Println("Server running on port 8080")
 	log.Fatal(http.ListenAndServe(":8080", r))
