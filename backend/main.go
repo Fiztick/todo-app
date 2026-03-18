@@ -32,9 +32,15 @@ func main() {
 
 	r.Use(corsMiddleware)
 
+	r.HandleFunc("/columns", handlers.GetColumns).Methods("GET", "OPTIONS")
+	r.HandleFunc("/columns", handlers.CreateColumn).Methods("POST", "OPTIONS")
+	r.HandleFunc("/columns/{id}", handlers.UpdateColumn).Methods("PATCH", "OPTIONS")
+	r.HandleFunc("/columns/{id}", handlers.DeleteColumn).Methods("DELETE", "OPTIONS")
+
 	r.HandleFunc("/tasks", handlers.GetTasks).Methods("GET", "OPTIONS")
 	r.HandleFunc("/tasks", handlers.CreateTask).Methods("POST", "OPTIONS")
-	r.HandleFunc("/tasks/{id}", handlers.CompleteTask).Methods("PATCH", "OPTIONS")
+	r.HandleFunc("/tasks/{id}/complete", handlers.CompleteTask).Methods("PATCH", "OPTIONS")
+	r.HandleFunc("/tasks/{id}/move", handlers.MoveTask).Methods("PATCH", "OPTIONS")
 	r.HandleFunc("/tasks/{id}", handlers.DeleteTask).Methods("DELETE", "OPTIONS")
 
 	log.Println("Server running on port 8080")
