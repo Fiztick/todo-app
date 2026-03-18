@@ -12,8 +12,6 @@ import (
 	"github.com/gorilla/mux"
 )
 
-var taskList = &models.TaskList{}
-
 func respondJson(w http.ResponseWriter, status int, data interface{}) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(status)
@@ -33,7 +31,8 @@ func GetTasks(w http.ResponseWriter, r *http.Request) {
 
 	defer rows.Close()
 
-	taskList = &models.TaskList{}
+	var tasks []models.Task
+
 	for rows.Next() {
 		var task models.Task
 		err := rows.Scan(&task.ID, &task.Title, &task.Completed, &task.CreatedAt)
@@ -41,9 +40,10 @@ func GetTasks(w http.ResponseWriter, r *http.Request) {
 			respondError(w, http.StatusInternalServerError, "Failed to scan task")
 			return
 		}
-		taskList.Enqueue(task)
+		tasks = append(tasks, task)
 	}
-	respondJson(w, http.StatusOK, taskList.GetAll())
+
+	respondJson(w, http.StatusOK, tasks)
 }
 
 func CreateTask(w http.ResponseWriter, r *http.Request) {
@@ -63,7 +63,6 @@ func CreateTask(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	taskList.Enqueue(task)
 	respondJson(w, http.StatusCreated, task)
 }
 
@@ -89,8 +88,6 @@ func CompleteTask(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	taskList.Remove(id)
-	taskList.Enqueue(task)
 	respondJson(w, http.StatusOK, task)
 }
 
@@ -108,6 +105,5 @@ func DeleteTask(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	taskList.Remove(id)
 	respondJson(w, http.StatusOK, map[string]string{"message": "Task Deleted"})
 }
