@@ -31,7 +31,7 @@ export async function createColumn(title: string): Promise<Column> {
     return res.json()
 }
 
-export async function UpdateColumn(id: number, title: string): Promise<Column> {
+export async function updateColumn(id: number, title: string): Promise<Column> {
     const res = await fetch(`${API_URL}/columns/${id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },

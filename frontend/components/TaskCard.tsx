@@ -6,11 +6,11 @@ import { Task } from "@/lib/api"
 
 type Props = {
     task: Task
-    onComplete: (id: number) => void
-    onDelete: (id: number) => void
+    onCompleteTask: (id: number) => void
+    onDeleteTask: (id: number) => void
 }
 
-export default function TaskCard({ task, onComplete, onDelete }: Props) {
+export default function TaskCard({ task, onCompleteTask, onDeleteTask }: Props) {
     const {
         attributes,
         listeners,
@@ -38,7 +38,7 @@ export default function TaskCard({ task, onComplete, onDelete }: Props) {
                     <input
                         type="text"
                         checked={task.completed}
-                        onChange={() => onComplete(task.id)}
+                        onChange={() => onCompleteTask(task.id)}
                         className="w-4 h-4 accent-blue-500"
                     />
                     <span className={`text-gray-800 text-sm ${task.completed ? "line-through text-gray-400" : ""}`}>
@@ -46,8 +46,8 @@ export default function TaskCard({ task, onComplete, onDelete }: Props) {
                     </span>
                 </div>
                 <button 
-                    className="text-red-400 hover:text-red-600 text-sm ml-2"
-                    onClick={() => onDelete(task.id)}    
+                    className="text-red-400 hover:text-red-600 text-sm ml-2 cursor-pointer"
+                    onClick={() => onDeleteTask(task.id)}    
                 >
                     x
                 </button>

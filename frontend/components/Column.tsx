@@ -9,8 +9,8 @@ import TaskCard from "./TaskCard"
 type Props = {
     column: ColumnType
     tasks: Task[]
-    onComplete: (id: number) => void
-    onDelete: (id: number) => void
+    onCompleteTask: (id: number) => void
+    onDeleteTask: (id: number) => void
     onAddTask: (title: string, columnId: number) => void
     onDeleteColumn: (id: number) => void
     onRenameColumn: (id: number, newTitle: string) => void
@@ -19,8 +19,8 @@ type Props = {
 export default function Column({
     column,
     tasks,
-    onComplete,
-    onDelete,
+    onCompleteTask,
+    onDeleteTask,
     onAddTask,
     onDeleteColumn,
     onRenameColumn,
@@ -83,8 +83,8 @@ export default function Column({
                         <TaskCard
                             key={task.id}
                             task={task}
-                            onComplete={onComplete}
-                            onDelete={onDelete}
+                            onCompleteTask={onCompleteTask}
+                            onDeleteTask={onDeleteTask}
                         />
                     ))}
                 </SortableContext>
