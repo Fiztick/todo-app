@@ -24,19 +24,20 @@ export default function TaskCard({ task, onCompleteTask, onDeleteTask }: Props) 
         transform: CSS.Transform.toString(transform),
         transition,
         opacity: isDragging ? 0.4 : 1,
+        width: isDragging ? "288px" : undefined,
     }
 
     return (
-        <div ref={setNodeRef} style={style} {...attributes} {...listeners}
-            className="bg-white rounded-lg shadow-sm border-gray-100 p-mb-2">
+        <div ref={setNodeRef} style={style}  {...attributes} {...listeners}
+            className="bg-white rounded-lg shadow-sm border-gray-100 p-3 mb-2">
             <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2 flex-1">
-                    <div {...attributes} {...listeners}
+                    <div
                         className="cursor-grab active:cursor-grabbing text-gray-300 hover:text-gray-500 select-none">
                         ⠿
                     </div>
                     <input
-                        type="text"
+                        type="checkbox"
                         checked={task.completed}
                         onChange={() => onCompleteTask(task.id)}
                         className="w-4 h-4 accent-blue-500"

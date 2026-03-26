@@ -1,8 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { DndContext, DragEndEvent, DragOverEvent, PointerSensor, useSensor, useSensors } from "@dnd-kit/core"
-import { arrayMove } from "@dnd-kit/sortable"
+import { DndContext, DragEndEvent, PointerSensor, useSensor, useSensors, pointerWithin, rectIntersection, CollisionDetection } from "@dnd-kit/core"
 import { Column as ColumnType, Task, getColumns, getTasks, createColumn, updateColumn, deleteColumn, createTask, completeTask, moveTask, deleteTask } from "@/lib/api"
 import Column from "./Column"
 
@@ -98,40 +97,12 @@ export default function Board() {
         }
     }
 
-    function onDragOver(event: DragOverEvent) {
-        const { active, over } = event
-        if (!over) return
-
-        const activeTask = tasks.find((t) => t.id === active.id)
-        if (!activeTask) return
-
-        const overId = over.id as number
-        const overTask = tasks.find((t) => t.id === overId)
-        const targetColumnId = overTask ? overTask.column_id : overId
-
-        if (activeTask.column_id === targetColumnId) {
-            setTasks((prev) => {
-                const oldIndex = prev.findIndex((t) => t.id === activeTask.id)
-                const newIndex = prev.findIndex((t) => t.id === overId)
-                return arrayMove(prev, oldIndex, newIndex)
-            })
-        } else {
-            setTasks((prev) => {
-                const withoutActive = prev.filter((t) => t.id !== activeTask.id)
-                const overIndex = withoutActive.findIndex((t) => t.id === overId)
-                const insertIndex = overIndex === -1 ? withoutActive.length : overIndex
-
-                const updatedTask = {
-                    ...activeTask,
-                    column_id: targetColumnId,
-                    position: insertIndex
-                }
-
-                const result = [...withoutActive]
-                result.splice(insertIndex, 0, updatedTask)
-                return result
-            })
+    const collisionDetection: CollisionDetection = (args) => {
+        const pointerCollisions = pointerWithin(args)
+        if (pointerCollisions.length > 0) {
+            return pointerCollisions
         }
+        return rectIntersection(args)
     }
 
     async function onDragEnd(event: DragEndEvent) {
@@ -143,12 +114,22 @@ export default function Board() {
 
         const overId = over.id as number
         const overTask = tasks.find((t) => t.id === overId)
-        const targetColumnId = overTask ? overTask.column_id : overId
-        const columnTasks = tasks.filter((t) => t.column_id === targetColumnId)
-        const newPosition = columnTasks.findIndex((t) => t.id === activeTask.id)
+        const isOverColumn = columns.some((c) => c.id === overId)
+        const targetColumnId = isOverColumn ? overId : overTask ? overTask.column_id : overId
+
+        if (activeTask.column_id === targetColumnId && !isOverColumn) return
+
+        const newPosition = tasks
+            .filter((t) => t.column_id === targetColumnId && t.id !== activeTask.id)
+            .length
 
         try {
             await moveTask(activeTask.id, targetColumnId, newPosition)
+            setTasks((prev) => prev.map((t) =>
+                t.id === activeTask.id
+                    ? { ...t, column_id: targetColumnId, position: newPosition }
+                    : t
+            ))
         } catch {
             setError("Failed to move task")
         }
@@ -165,20 +146,17 @@ export default function Board() {
     return (
         <div className="min-h-screen bg-gray-50 p-6">
             <div className="mb-6">
-                <h1 className="text-3xl font-bold text-gray-800 mb-1">
-                    My Board
-                </h1>
-                <p className="text-gray-400 text-sm">
-                    Drag cards between columns
-                </p>
-
-                {error && (
-                    <p className="text-red-400 mb-4 text-sm">{error}</p>
-                )}
+                <h1 className="text-3xl font-bold text-gray-800 mb-1">My Board</h1>
+                <p className="text-gray-400 text-sm">Drag cards between columns</p>
             </div>
+
+            {error && (
+                <p className="text-red-400 mb-4 text-sm">{error}</p>
+            )}
+
             <DndContext
                 sensors={sensors}
-                onDragOver={onDragOver}
+                collisionDetection={collisionDetection}
                 onDragEnd={onDragEnd}
             >
                 <div className="flex gap-4 overflow-x-auto pb-4">
@@ -198,9 +176,7 @@ export default function Board() {
                         <input
                             type="text"
                             value={newColumnTitle}
-                            onChange={(e) =>
-                                setNewColumnTitle(e.target.value)
-                            }
+                            onChange={(e) => setNewColumnTitle(e.target.value)}
                             onKeyDown={(e) => e.key === "Enter" && handleAddColumn()}
                             placeholder="New column name..."
                             className="text-sm px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400 text-gray-800"

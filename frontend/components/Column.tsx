@@ -1,9 +1,9 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useMemo } from "react"
 import { useDroppable } from "@dnd-kit/core"
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable"
-import { Column as ColumnType, Task } from "@/lib/api"
+import type { Column as ColumnType, Task } from "@/lib/api"
 import TaskCard from "./TaskCard"
 
 type Props = {
@@ -30,6 +30,8 @@ export default function Column({
     const [isRenaming, setIsRenaming] = useState(false)
     const [renameValue, setRenameValue] = useState(column.title)
 
+    const taskIds = useMemo(() => tasks.map((t) => t.id), [tasks])
+
     function handleAddTask() {
         if (input.trim() === "") return
         onAddTask(input, column.id)
@@ -43,7 +45,7 @@ export default function Column({
     }
 
     return (
-        <div className="bg-gray-100 rounded-x1 p-3 w-72 flex-shrink-0">
+        <div className="bg-gray-100 rounded-xl p-3 w-72 flex-shrink-0">
             <div className="flex items-center justify-between mb-3">
                 {isRenaming ? (
                     <input
@@ -73,10 +75,10 @@ export default function Column({
 
             <div
                 ref={setNodeRef}
-                className={`min-h-20 rounded-lg transition-colors ${isOver ? "bg-blue-50" : ""}`}
+                className={`min-h-32 rounded-lg transition-colors ${isOver ? "bg-blue-50" : ""}`}
             >
                 <SortableContext
-                    items={tasks.map((t) => t.id)}
+                    items={taskIds}
                     strategy={verticalListSortingStrategy}
                 >
                     {tasks.map((task) => (
