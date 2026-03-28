@@ -262,3 +262,42 @@ func DeleteTask(w http.ResponseWriter, r *http.Request) {
 
 	respondJson(w, http.StatusOK, map[string]string{"message": "Task Deleted"})
 }
+
+func EditTask(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id, err := strconv.Atoi(vars["id"])
+	if err != nil {
+		respondError(w, http.StatusBadRequest, "Invalid Task ID")
+		return
+	}
+
+	var body struct {
+		Title string `json:"title"`
+	}
+	err = json.NewDecoder(r.Body).Decode(&body)
+	if err != nil {
+		respondError(w, http.StatusBadRequest, "Invalid request body")
+		return
+	}
+
+	var task models.Task
+	var columnID sql.NullInt64
+	err = db.DB.QueryRow(
+		`UPDATE tasks SET title = $1 WHERE id = $2
+		 RETURNING id, title, completed, column_id, position, created_at`,
+		body.Title, id,
+	).Scan(&task.ID, &task.Title, &task.Completed, &columnID, &task.Position, task.CreatedAt)
+	if err == sql.ErrNoRows {
+		respondError(w, http.StatusNotFound, "Task not found")
+		return
+	}
+	if err != nil {
+		respondError(w, http.StatusInternalServerError, "Failed to edit task")
+		return
+	}
+	if columnID.Valid {
+		task.ColumnID = int(columnID.Int64)
+	}
+
+	respondJson(w, http.StatusOK, task)
+}

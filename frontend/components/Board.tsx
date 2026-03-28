@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { DndContext, DragEndEvent, PointerSensor, useSensor, useSensors, pointerWithin, rectIntersection, CollisionDetection } from "@dnd-kit/core"
-import { Column as ColumnType, Task, getColumns, getTasks, createColumn, updateColumn, deleteColumn, createTask, completeTask, moveTask, deleteTask } from "@/lib/api"
+import { Column as ColumnType, Task, getColumns, getTasks, createColumn, updateColumn, deleteColumn, createTask, completeTask, moveTask, deleteTask, editTask } from "@/lib/api"
 import Column from "./Column"
 
 export default function Board() {
@@ -64,6 +64,15 @@ export default function Board() {
             setTasks((prev) => prev.filter((t) => t.id !== id))
         } catch {
             setError("Failed to delete task")
+        }
+    }
+
+    async function handleEditTask(id: number, title: string) {
+        try {
+            const updated = await editTask(id, title)
+            setTasks((prev) => prev.map((t) => (t.id === id ? updated : t)))
+        } catch {
+            setError("Failed to edit task")
         }
     }
 
@@ -167,6 +176,7 @@ export default function Board() {
                             tasks={getTasksForColumn(col.id)}
                             onCompleteTask={handleCompleteTask}
                             onDeleteTask={handleDeleteTask}
+                            onEditTask={handleEditTask}
                             onAddTask={handleAddTask}
                             onDeleteColumn={handleDeleteColumn}
                             onRenameColumn={handleRenameColumn}

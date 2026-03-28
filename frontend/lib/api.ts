@@ -82,3 +82,12 @@ export async function deleteTask(id: number): Promise<void> {
         method: "DELETE",
     })
 }
+
+export async function editTask(id: number, title: string): Promise<Task> {
+    const res = await fetch(`${API_URL}/TASKS/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({title})
+    })
+    return res.json()
+}

@@ -11,6 +11,7 @@ type Props = {
     tasks: Task[]
     onCompleteTask: (id: number) => void
     onDeleteTask: (id: number) => void
+    onEditTask: (id: number, title: string) => void
     onAddTask: (title: string, columnId: number) => void
     onDeleteColumn: (id: number) => void
     onRenameColumn: (id: number, newTitle: string) => void
@@ -21,6 +22,7 @@ export default function Column({
     tasks,
     onCompleteTask,
     onDeleteTask,
+    onEditTask,
     onAddTask,
     onDeleteColumn,
     onRenameColumn,
@@ -87,6 +89,7 @@ export default function Column({
                             task={task}
                             onCompleteTask={onCompleteTask}
                             onDeleteTask={onDeleteTask}
+                            onEditTask={onEditTask}
                         />
                     ))}
                 </SortableContext>

@@ -42,6 +42,7 @@ func main() {
 	r.HandleFunc("/tasks/{id}/complete", handlers.CompleteTask).Methods("PATCH", "OPTIONS")
 	r.HandleFunc("/tasks/{id}/move", handlers.MoveTask).Methods("PATCH", "OPTIONS")
 	r.HandleFunc("/tasks/{id}", handlers.DeleteTask).Methods("DELETE", "OPTIONS")
+	r.HandleFunc("/tasks/{id}", handlers.EditTask).Methods("PATCH", "OPTIONS")
 
 	log.Println("Server running on port 8080")
 	log.Fatal(http.ListenAndServe(":8080", r))
