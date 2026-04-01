@@ -76,7 +76,7 @@ export default function TaskCard({ task, onCompleteTask, onDeleteTask, onEditTas
                     ) : (
                         <span
                             onClick={() => setIsEditing(true)}
-                            className="{`flex-1 text-gray-800 text-sm cursor-pointer hover:text-blue-500 ${task.completed ? 'line-through text-gray-400' : ''`}"
+                            className={`flex-1 text-gray-800 text-sm cursor-pointer hover:text-blue-500 ${task.completed ? "line-through text-gray-400" : ""}`}
                         >
                             {task.title}
                         </span>
