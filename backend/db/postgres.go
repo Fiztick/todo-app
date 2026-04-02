@@ -25,7 +25,7 @@ func Connect() {
 	)
 
 	var err error
-	for i := 1; i <= 10; i++ {
+	for i := 1; i <= 20; i++ {
 		DB, err = sql.Open("postgres", dsn)
 		if err == nil {
 			err = DB.Ping()
@@ -33,7 +33,7 @@ func Connect() {
 		if err == nil {
 			break
 		}
-		log.Printf("DB not ready, retrying in 3 seconds... (attempt %d/10)", i)
+		log.Printf("DB not ready, retrying in 3 seconds... (attempt %d/20)", i)
 		time.Sleep(3 * time.Second)
 	}
 
@@ -47,37 +47,40 @@ func Connect() {
 
 func createTables() {
 	queries := []string{
+		`CREATE TABLE IF NOT EXISTS users (
+			id SERIAL PRIMARY KEY,
+			username TEXT NOT NULL,
+			password TEXT NOT NULL,
+			created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+	)`,
+		`CREATE TABLE IF NOT EXISTS boards(
+			id SERIAL PRIMARY KEY,
+			title TEXT NOT NULL,
+			user_id INT REFERENCES users(id) ON DELETE CASCADE,
+			created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+	)`,
 		`CREATE TABLE IF NOT EXISTS columns (
 			id SERIAL PRIMARY KEY,
 			title TEXT NOT NULL,
 			position INT NOT NULL DEFAULT 0,
+			board_id INT REFERENCES boards(id) ON DELETE CASCADE,
 			created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 	);`,
 		`CREATE TABLE IF NOT EXISTS tasks (
 			id SERIAL PRIMARY KEY,
 			title TEXT NOT NULL,
 			completed BOOLEAN DEFAULT FALSE,
-			column_id INT REFERENCES columns(id) ON DELETE SET NULL,
+			column_id INT REFERENCES columns(id) ON DELETE RESTRICT,
 			position INT NOT NULL DEFAULT 0,
 			created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-	);`,
-		`INSERT INTO columns (title, position)
-		SELECT 'To Do', 0
-		WHERE NOT EXISTS (SELECT 1 FROM columns)`,
-		`INSERT INTO columns (title, position)
-		SELECT 'In Progress', 1
-		WHERE NOT EXISTS (SELECT 1 FROM columns OFFSET 1)`,
-		`INSERT INTO columns (title, position)
-		SELECT 'Done', 2
-		WHERE NOT EXISTS (SELECT 1 FROM columns OFFSET 2)`,
-	}
+	);`}
 
 	for _, query := range queries {
 		_, err := DB.Exec(query)
 		if err != nil {
-			log.Fatal("Failed to create tasks table: ", err)
+			log.Fatal("Failed to create tables: ", err)
 		}
 	}
 
-	log.Println("Tasks table is ready!")
+	log.Println("All tables are ready!")
 }
