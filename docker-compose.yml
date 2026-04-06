@@ -20,6 +20,7 @@ services:
       DB_USER: postgres
       DB_PASSWORD: root
       DB_NAME: todo
+      JWT_SECRET: go-todo-secret
     depends_on:
       - postgres
     
