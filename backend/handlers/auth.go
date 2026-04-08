@@ -58,7 +58,7 @@ func Register(w http.ResponseWriter, r *http.Request) {
 	}
 
 	respondJson(w, http.StatusCreated, map[string]string{
-		"message": "User Registered successfully",
+		"message": "User registered successfully",
 	})
 }
 
@@ -80,7 +80,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 
 	var user models.User
 	err = db.DB.QueryRow(
-		`SELECT id, username, password, create_at FROM users WHERE username = $1`,
+		`SELECT id, username, password, created_at FROM users WHERE username = $1`,
 		body.Username,
 	).Scan(&user.ID, &user.Username, &user.Password, &user.CreatedAt)
 	if err != nil {

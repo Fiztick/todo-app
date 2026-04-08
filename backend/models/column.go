@@ -2,11 +2,10 @@ package models
 
 import "time"
 
-type Task struct {
+type Column struct {
 	ID        int       `json:"id"`
 	Title     string    `json:"title"`
-	Completed bool      `json:"completed"`
-	ColumnID  int       `json:"column_id"`
 	Position  int       `json:"position"`
+	BoardID   int       `json:"board_id"`
 	CreatedAt time.Time `json:"created_at"`
 }

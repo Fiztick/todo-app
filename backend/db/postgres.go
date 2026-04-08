@@ -33,12 +33,12 @@ func Connect() {
 		if err == nil {
 			break
 		}
-		log.Printf("DB not ready, retrying in 3 seconds... (attempt %d/20)", i)
-		time.Sleep(3 * time.Second)
+		log.Printf("DB not ready, retrying in 5 seconds... (attempt %d/20)", i)
+		time.Sleep(5 * time.Second)
 	}
 
 	if err != nil {
-		log.Fatal("Failed to connect to DB after 10 attempts:", err)
+		log.Fatal("Failed to connect to DB after 20 attempts:", err)
 	}
 
 	log.Println("Connected to PostgreSQL successfully!")
@@ -49,7 +49,7 @@ func createTables() {
 	queries := []string{
 		`CREATE TABLE IF NOT EXISTS users (
 			id SERIAL PRIMARY KEY,
-			username TEXT NOT NULL,
+			username TEXT NOT NULL UNIQUE,
 			password TEXT NOT NULL,
 			created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 	)`,

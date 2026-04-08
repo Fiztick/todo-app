@@ -11,7 +11,7 @@ import (
 	"github.com/gorilla/mux"
 )
 
-func getBoards(w http.ResponseWriter, r *http.Request) {
+func GetBoards(w http.ResponseWriter, r *http.Request) {
 	userID := middleware.GetUserID(r)
 
 	rows, err := db.DB.Query(
